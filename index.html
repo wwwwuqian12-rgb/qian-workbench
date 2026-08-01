@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#ff8fb1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%23ff8fb1'/%3E%3Ctext x='256' y='330' font-size='300' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E倩%3C/text%3E%3C/svg%3E">
+<title>倩倩の专属工作台</title>
+<style>
+:root{--pink-1:#fff0f5;--pink-2:#ffd6e7;--pink-3:#ffb6d5;--pink-4:#ff8fb1;--pink-5:#ff6fa5;--pink-deep:#ec5a92;--text:#5a3a4a;--shadow:0 4px 16px rgba(255,143,177,.25);}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;height:100%;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--pink-1);color:var(--text);}
+.app{display:flex;min-height:100vh;}
+.sidebar{width:96px;background:linear-gradient(180deg,var(--pink-4),var(--pink-5));position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:4px;overflow-y:auto;z-index:20;box-shadow:2px 0 12px rgba(236,90,146,.2);}
+.logo{font-size:13px;font-weight:800;color:#fff;text-align:center;margin-bottom:8px;line-height:1.3;text-shadow:0 1px 3px rgba(0,0,0,.15);}
+.menu-item{flex:0 0 auto;width:80px;padding:10px 2px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:3px;color:#fff;cursor:pointer;transition:.2s;font-size:11px;text-align:center;background:rgba(255,255,255,.12);margin:3px 0;}
+.menu-item .ico{font-size:22px;}
+.menu-item.active{background:#fff;color:var(--pink-deep);font-weight:700;transform:scale(1.04);box-shadow:var(--shadow);}
+.content{margin-left:96px;flex:1;padding:18px 16px 40px;max-width:760px;}
+.page{display:none;animation:fade .3s;}
+.page.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.card{background:#fff;border-radius:20px;padding:16px;margin-bottom:16px;box-shadow:var(--shadow);}
+.page-title{font-size:20px;font-weight:800;color:var(--pink-deep);margin:0 0 4px;display:flex;align-items:center;gap:8px;}
+.page-sub{font-size:12px;color:#b089a0;margin:0 0 14px;}
+label{display:block;font-size:13px;font-weight:600;margin:10px 0 5px;color:var(--text);}
+input,textarea,select{width:100%;border:2px solid var(--pink-2);border-radius:14px;padding:10px 12px;font-size:14px;font-family:inherit;background:var(--pink-1);color:var(--text);outline:none;}
+input:focus,textarea:focus,select:focus{border-color:var(--pink-4);}
+textarea{resize:vertical;min-height:64px;}
+.btn{background:linear-gradient(135deg,var(--pink-4),var(--pink-5));color:#fff;border:none;border-radius:16px;padding:11px 18px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:var(--shadow);width:100%;margin-top:12px;}
+.btn:active{transform:scale(.97);}
+.btn.small{width:auto;padding:7px 14px;font-size:12px;border-radius:12px;margin-top:0;}
+.row{display:flex;gap:10px;}
+.row>*{flex:1;}
+.stat-grid{display:flex;gap:10px;margin:10px 0;}
+.stat{flex:1;background:var(--pink-1);border-radius:16px;padding:12px;text-align:center;}
+.stat .num{font-size:24px;font-weight:800;color:var(--pink-deep);}
+.stat .lab{font-size:11px;color:#b089a0;margin-top:2px;}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal .cell{aspect-ratio:1;border-radius:10px;background:var(--pink-1);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text);cursor:pointer;border:2px solid transparent;}
+.cal .cell.done{background:var(--pink-4);color:#fff;font-weight:700;}
+.cal .cell.today{border-color:var(--pink-deep);}
+.cal .wd{font-size:10px;color:#b089a0;text-align:center;font-weight:700;}
+.item{background:var(--pink-1);border-radius:14px;padding:12px;margin-bottom:10px;}
+.item h4{margin:0 0 4px;font-size:14px;color:var(--pink-deep);}
+.item p{margin:0;font-size:12px;color:var(--text);line-height:1.5;}
+.tag{display:inline-block;background:var(--pink-3);color:#fff;border-radius:8px;padding:2px 8px;font-size:11px;margin:3px 4px 0 0;}
+.link-btn{display:inline-block;background:var(--pink-5);color:#fff;border-radius:12px;padding:7px 14px;font-size:12px;font-weight:700;text-decoration:none;margin-top:8px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th,td{border:1px solid var(--pink-2);padding:7px 6px;text-align:left;}
+th{background:var(--pink-2);color:var(--pink-deep);}
+.play{background:var(--pink-4);color:#fff;border:none;border-radius:50%;width:34px;height:34px;font-size:14px;cursor:pointer;margin-left:8px;}
+.word-row{display:flex;align-items:center;justify-content:space-between;background:var(--pink-1);border-radius:14px;padding:10px 14px;margin-bottom:8px;}
+.word-row .en{font-weight:700;color:var(--pink-deep);font-size:15px;}
+.word-row .ph{font-size:12px;color:#b089a0;}
+.word-row .cn{font-size:12px;}
+.del{background:#ffd0d0;color:#c0392b;border:none;border-radius:10px;padding:4px 9px;font-size:11px;cursor:pointer;}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--pink-deep);color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;z-index:99;opacity:0;transition:.3s;box-shadow:var(--shadow);}
+.toast.show{opacity:1;}
+.sechdr{font-size:15px;font-weight:800;color:var(--pink-deep);margin:14px 0 8px;}
+.empty{text-align:center;color:#c9a9b8;font-size:13px;padding:20px;}
+@media(max-width:420px){.logo{font-size:11px;}.menu-item{width:74px;font-size:10px;}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar"><div class="logo">倩倩<br>工作台</div></aside>
+<main class="content" id="content"></main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600);}
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function getStore(key,def){try{return JSON.parse(localStorage.getItem('qq_'+key))||def;}catch(e){return def;}}
+function setStore(key,val){localStorage.setItem('qq_'+key,JSON.stringify(val));}
+function encPhone(p){try{return btoa(unescape(encodeURIComponent(p)));}catch(e){return p;}}
+function decPhone(s){try{return decodeURIComponent(escape(atob(s)));}catch(e){return s;}}
+function speak(text){if(!('speechSynthesis'in window)){toast('当前浏览器不支持发音');return;}const u=new SpeechSynthesisUtterance(text);u.lang='en-GB';u.rate=.9;window.speechSynthesis.cancel();window.speechSynthesis.speak(u);}
+const MENUS=[
+{id:'burn',ico:'🔥',name:'抗炎打卡'},
+{id:'period',ico:'🌸',name:'生理期'},
+{id:'sport',ico:'🏃',name:'运动打卡'},
+{id:'english',ico:'📖',name:'英语学习'},
+{id:'read',ico:'📚',name:'每日阅读'},
+{id:'client',ico:'💼',name:'客户档案'},
+{id:'account',ico:'💰',name:'业绩对账'},
+{id:'podcast',ico:'🎙️',name:'播客推荐'},
+{id:'review',ico:'📝',name:'每周复盘'},
+];
+const sidebar=$('#sidebar');
+MENUS.forEach(m=>{const d=document.createElement('div');d.className='menu-item';d.dataset.id=m.id;d.innerHTML=`<div class="ico">${m.ico}</div><div>${m.name}</div>`;d.onclick=()=>showPage(m.id);sidebar.appendChild(d);});
+const content=$('#content');
+function showPage(id){$$('.menu-item').forEach(e=>e.classList.toggle('active',e.dataset.id===id));content.innerHTML='';const map={burn:pageBurn,period:pagePeriod,sport:pageSport,english:pageEnglish,read:pageRead,client:pageClient,account:pageAccount,podcast:pagePodcast,review:pageReview};(map[id]||pageBurn)();window.scrollTo(0,0);}
+/* ============ 1. 减脂抗炎打卡 ============ */
+function pageBurn(){
+  const data=getStore('burn',{});
+  const t=todayStr(); const rec=data[t]||{};
+  content.innerHTML=`
+  <div class="card">
+    <div class="page-title">🔥 减脂抗炎打卡</div>
+    <div class="page-sub">记录今日身体与饮食状态 · ${t}</div>
+    <label>晨起空腹体重 (kg)</label><input id="bw" type="number" step="0.1" value="${rec.weight||''}" placeholder="如 58.5">
+    <label>三餐食材与热量估算</label><textarea id="bmeal" placeholder="早餐：鸡蛋+燕麦... 估算约 350kcal">${rec.meal||''}</textarea>
+    <label>抗炎果汁配方用量</label><input id="bjuice" value="${rec.juice||''}" placeholder="如 羽衣甘蓝30g+柠檬半颗">
+    <label>快走/运动完成情况</label>
+    <select id="bsport"><option value="">请选择</option><option ${rec.sport==='完成'?'selected':''}>完成</option><option ${rec.sport==='未做'?'selected':''}>未做</option></select>
+    <label>玫瑰痤疮/皮肤炎症状态</label>
+    <select id="bskin"><option value="">请选择</option><option ${rec.skin==='稳定'?'selected':''}>稳定</option><option ${rec.skin==='泛红'?'selected':''}>泛红</option><option ${rec.skin==='加重'?'selected':''}>加重</option></select>
+    <label>水肿情况</label>
+    <select id="bswell"><option value="">请选择</option><option ${rec.swell==='无'?'selected':''}>无</option><option ${rec.swell==='轻微'?'selected':''}>轻微</option><option ${rec.swell==='明显'?'selected':''}>明显</option></select>
+    <button class="btn" onclick="saveBurn()">💾 保存今日打卡</button>
+  </div>
+  <div class="card">
+    <div class="page-title">📈 近期记录</div>
+    ${Object.keys(data).sort().reverse().slice(0,7).map(d=>`<div class="item"><h4>${d}</h4><p>体重：${data[d].weight||'-'}kg ｜ 运动：${data[d].sport||'-'} ｜ 皮肤：${data[d].skin||'-'} ｜ 水肿：${data[d].swell||'-'}</p></div>`).join('')||'<div class="empty">还没有记录哦～</div>'}
+  </div>`;
+}
+function saveBurn(){
+  const data=getStore('burn',{});
+  data[todayStr()]={
+    weight:$('#bw').value,meal:$('#bmeal').value,juice:$('#bjuice').value,
+    sport:$('#bsport').value,skin:$('#bskin').value,swell:$('#bswell').value
+  };
+  setStore('burn',data);toast('✅ 打卡成功');pageBurn();
+}
+
+/* ============ 2. 生理期记录 ============ */
+function pagePeriod(){
+  const data=getStore('period',{});
+  const t=todayStr(); const rec=data[t]||{};
+  content.innerHTML=`
+  <div class="card">
+    <div class="page-title">🌸 生理期记录</div>
+    <div class="page-sub">关爱自己，从记录开始 · ${t}</div>
+    <label>末次月经日期</label><input id="plast" type="date" value="${data.last||''}">
+    <label>周期天数（默认28）</label><input id="pcycle" type="number" value="${data.cycle||28}">
+    <label>经前/经期体感记录</label><textarea id="pfeel" placeholder="疲惫/腰酸/泛红加重...">${rec.feel||''}</textarea>
+    <label>经期饮食运动调整备注</label><textarea id="pnote" placeholder="减少生冷/避免高强度...">${rec.note||''}</textarea>
+    <label>今日是否经期</label>
+    <select id="pon"><option value="">请选择</option><option ${rec.period===1?'selected':''}>是（经期第一天）</option><option ${rec.period===0?'selected':''}>否</option></select>
+    <button class="btn" onclick="savePeriod()">💾 保存</button>
+  </div>
+  <div class="card" id="pnext"></div>`;
+  renderPeriodNext();
+}
+function renderPeriodNext(){
+  const data=getStore('period',{});
+  const last=data.last,cycle=+data.cycle||28;
+  let html='<div class="page-title">🔮 周期预测</div>';
+  if(last){
+    const d=new Date(last);d.setDate(d.getDate()+cycle);
+    const next=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    html+=`<p style="font-size:13px">末次月经：<b>${last}</b><br>周期：${cycle}天<br>预估下次来潮：<b style="color:var(--pink-deep)">${next}</b></p>`;
+  }else{html+='<div class="empty">填写末次月经日期后自动预测～</div>';}
+  $('#pnext').innerHTML=html;
+}
+function savePeriod(){
+  const data=getStore('period',{});
+  data.last=$('#plast').value;data.cycle=$('#pcycle').value||28;
+  data[todayStr()]={feel:$('#pfeel').value,note:$('#pnote').value,period:$('#pon').value===''?'':+$('#pon').value};
+  setStore('period',data);toast('✅ 已保存');renderPeriodNext();
+}
+
+/* ============ 3. 每日运动打卡 ============ */
+const SPORT_COURSES=[
+  {name:'Jo姐·无跳跃全身燃脂（大基数友好）',kw:'Jo姐 无跳跃 有氧',by:'B站'},
+  {name:'MIZI·10分钟膝盖友好有氧',kw:'MIZI 有氧 无跳跃',by:'B站'},
+  {name:'欧阳春晓·肩颈拉伸放松',kw:'欧阳春晓 肩颈拉伸',by:'B站'},
+  {name:'大基数快走塑形跟练',kw:'快走 塑形 跟练',by:'B站'},
+  {name:'经期可做·躺平瑜伽舒缓',kw:'经期 瑜伽 舒缓',by:'B站'},
+];
+function biliLink(kw){return 'https://search.bilibili.com/all?keyword='+encodeURIComponent(kw);}
+function pageSport(){
+  const checkins=getStore('sport_check',{});
+  const t=todayStr();
+  // 统计
+  const all=Object.keys(checkins).filter(k=>checkins[k]);
+  const cont=calcContinuous(checkins);
+  const wk=weekKeys().filter(k=>checkins[k]).length;
+  const mon=Object.keys(checkins).filter(k=>k.startsWith(t.slice(0,7))&&checkins[k]).length;
+  content.innerHTML=`
+  <div class="card">
+    <div class="page-title">🏃 每日运动打卡</div>
+    <div class="page-sub">低强度·无跳跃·膝盖友好·经期可做 · ${t}</div>
+    <div class="stat-grid">
+      <div class="stat"><div class="num">${cont}</div><div class="lab">连续打卡(天)</div></div>
+      <div class="stat"><div class="num">${wk}</div><div class="lab">本周打卡</div></div>
+      <div class="stat"><div class="num">${all.length}</div><div class="lab">累计打卡</div></div>
+    </div>
+    <button class="btn ${checkins[t]?'':'small'}" onclick="toggleSport()">${checkins[t]?'✅ 今日已打卡（点击取消）':'💪 今日运动打卡'}</button>
+  </div>
+  <div class="card">
+    <div class="page-title">🎬 今日推荐跟练</div>
+    ${SPORT_COURSES.map((c,i)=>`<div class="item"><h4>${i+1}. ${c.name}</h4><a class="link-btn" href="${biliLink(c.kw)}" target="_blank" rel="noopener">▶ ${c.by}一键跳转</a></div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="sechdr">📅 本周打卡日历</div><div class="cal" id="calwk"></div>
+    <div class="sechdr">📅 本月打卡日历</div><div class="cal" id="calmon"></div>
+  </div>`;
+  renderCal('calwk',weekKeys());
+  renderCal('calmon',monthKeys());
+}
+function toggleSport(){const c=getStore('sport_check',{});const t=todayStr();c[t]=!c[t];setStore('sport_check',c);toast(c[t]?'💪 打卡成功':'已取消');pageSport();}
+function weekKeys(){const arr=[];const d=new Date();const day=(d.getDay()+6)%7;for(let i=day;i>=0;i--){const x=new Date(d);x.setDate(d.getDate()-i);arr.push(fmt(x));}return arr;}
+function monthKeys(){const arr=[];const d=new Date();const y=d.getFullYear(),m=d.getMonth();const n=new Date(y,m+1,0).getDate();for(let i=1;i<=n;i++){const x=new Date(y,m,i);if(x<=d)arr.push(fmt(x));}return arr;}
+function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function renderCal(id,keys){const c=getStore('sport_check',{});const el=$('#'+id);
+  const wd=['一','二','三','四','五','六','日'];let h=wd.map(w=>`<div class="wd">${w}</div>`).join('');
+  // 补前导空格
+  const first=new Date(keys[0]);const offset=(first.getDay()+6)%7;for(let i=0;i<offset;i++)h+='<div></div>';
+  keys.forEach(k=>{const cls='cell'+(c[k]?' done':'')+(k===todayStr()?' today':'');h+=`<div class="${cls}" onclick="markSport('${k}')">${+k.slice(8,10)}</div>`;});
+  el.innerHTML=h;}
+function markSport(k){const c=getStore('sport_check',{});c[k]=!c[k];setStore('sport_check',c);pageSport();}
+function calcContinuous(check){
+  let n=0;const d=new Date();
+  if(!check[fmt(d)]){d.setDate(d.getDate()-1);}
+  while(check[fmt(d)]){n++;d.setDate(d.getDate()-1);}
+  return n;
+}
+
+/* ============ 4. 英语学习 ============ */
+const EN_WORDS=[
+  {en:'boarding',ph:'/ˈbɔːrdɪŋ/',cn:'登机； boarding pass 登机牌'},
+  {en:'itinerary',ph:'/aɪˈtɪnəreri/',cn:'行程单；旅行计划'},
+  {en:'currency',ph:'/ˈkɜːrənsi/',cn:'货币；外币兑换'},
+  {en:'souvenir',ph:'/ˌsuːvənˈɪr/',cn:'纪念品'},
+  {en:'connection',ph:'/kəˈnekʃn/',cn:'转机；衔接'},
+  {en:'buffet',ph:'/bʊˈfeɪ/',cn:'自助餐'},
+  {en:'complimentary',ph:'/ˌkɑːmplɪˈmentri/',cn:'免费的（酒店常用）'},
+  {en:'reservation',ph:'/ˌrezərˈveɪʃn/',cn:'预订（之前学过）'},
+  {en:'negotiate',ph:'/nɪˈɡoʊʃieɪt/',cn:'谈判；议价（商务）'},
+  {en:'invoice',ph:'/ˈɪnvɔɪs/',cn:'发票；账单'},
+  {en:'consultation',ph:'/ˌkɑːnslˈteɪʃn/',cn:'咨询；医美面诊'},
+  {en:'procedure',ph:'/prəˈsiːdʒər/',cn:'流程；手术项目'},
+  {en:'quote',ph:'/kwoʊt/',cn:'报价'},
+  {en:'deposit',ph:'/dɪˈpɑːzɪt/',cn:'定金；押金'},
+  {en:'follow-up',ph:'/ˈfɑːloʊ ʌp/',cn:'跟进；回访'},
+];
+const EN_GRAMMAR=[
+  '一般过去时：规则动词加-ed，不规则需记忆（go→went, buy→bought）。描述已发生的旅行用过去时。',
+  '现在完成时 have/has + done：强调过去动作对现在的影响，如 I have finished my work.',
+  '比较级：单音节+er（cheaper），多音节用 more（more expensive）。最高级同理。',
+  '情态动词 can/could/may：can 表能力，may 表许可，could 更礼貌地请求。',
+  '定语从句：who 指人，which/that 指物，如 The hotel which we booked is nice.',
+];
+const EN_SENTENCES=[
+  {en:'Could you recommend a local restaurant?',cn:'能推荐一家当地餐厅吗？'},
+  {en:'I’d like to reschedule my appointment.',cn:'我想重新预约时间。'},
+  {en:'Is breakfast included in the price?',cn:'价格包含早餐吗？'},
+  {en:'Could you speak a little slower, please?',cn:'能说慢一点吗？'},
+  {en:'Where can I exchange foreign currency?',cn:'在哪能换外币？'},
+  {en:'I’d like to negotiate the package price.',cn:'我想谈谈套餐价格。'},
+  {en:'Do you have any certificates for this procedure?',cn:'这个项目有资质证书吗？'},
+  {en:'May I have a detailed quotation?',cn:'能给我详细报价单吗？'},
+  {en:'I need a follow-up consultation next week.',cn:'我下周需要回访面诊。'},
+  {en:'Can I pay a deposit first?',cn:'我能先付定金吗？'},
+];
+function pageEnglish(){
+  const t=todayStr();
+  const hist=getStore('en_hist',[]);
+  const seed=Math.abs(hash(t))%EN_WORDS.length;
+  const words=[0,1,2,3,4].map(i=>EN_WORDS[(seed+i)%EN_WORDS.length]);
+  const grammar=EN_GRAMMAR[seed%EN_GRAMMAR.length];
+  const sseed=Math.abs(hash(t+'s'))%EN_SENTENCES.length;
+  const sents=[0,1,2,3,4].map(i=>EN_SENTENCES[(sseed+i)%EN_SENTENCES.length]);
+  content.innerHTML=`
+  <div class="card">
+    <div class="page-title">📖 英语学习提升</div>
+    <div class="page-sub">每日5单词 + 1语法 + 5实用句 · ${t}</div>
+    <div class="sechdr">🌟 今日5个高频单词</div>
+    ${words.map(w=>`<div class="word-row"><div><div class="en">${w.en}</div><div class="ph">${w.ph}</div><div class="cn">${w.cn}</div></div><button class="play" onclick="speak('${w.en}')">🔊</button></div>`).join('')}
+    <div class="sechdr">📐 语法知识点</div>
+    <div class="item"><p>${grammar}</p></div>
+    <div class="sechdr">💬 今日5句实用短句（点击🔊跟读）</div>
+    ${sents.map(s=>`<div class="word-row"><div><div class="en">${s.en}</div><div class="cn">${s.cn}</div></div><button class="play" onclick="speak('${s.en.replace(/'/g,"\\'")}')">🔊</button></div>`).join('')}
+    <button class="btn" onclick="enCheckin()">✅ 今日跟读打卡（已学${words.length}词+${sents.length}句）</button>
+  </div>
+  <div class="card">
+    <div class="page-title">📜 学习历史</div>
+    ${hist.slice().reverse().slice(0,8).map(h=>`<div class="item"><h4>${h.date}</h4><p>单词${h.words}个 ｜ 短句${h.sents}句</p></div>`).join('')||'<div class="empty">还没有打卡记录～</div>'}
+  </div>`;
+}
+function enCheckin(){
+  const hist=getStore('en_hist',[]);
+  hist.push({date:todayStr(),words:5,sents:5});
+  setStore('en_hist',hist);toast('✅ 英语打卡成功');pageEnglish();
+}
+function hash(s){let h=0;for(let i=0;i<s.length;i++){h=(h<<5)-h+s.charCodeAt(i);h|=0;}return h;}
+
+/* ============ 5. 每日阅读 ============ */
+const READ_ITEMS=[
+  {title:'36氪·每日商业精选',desc:'前沿创投、轻资产创业方向',url:'https://36kr.com/'},
+  {title:'虎嗅·商业洞察',desc:'商业趋势与女性创业案例',url:'https://www.huxiu.com/'},
+  {title:'医美行业观察（新氧/更美资讯）',desc:'医美合规、消费趋势',url:'https://www.soyoung.com/'},
+  {title:'第一财经·财经热点',desc:'宏观经济实时资讯',url:'https://www.yicai.com/'},
+  {title:'得到·成长类书籍推荐',desc:'认知提升精选书单',url:'https://www.dedao.cn/'},
+];
+function pageRead(){
+  const check=getStore('read_check',{});const t=todayStr();
+  content.innerHTML=`
+  <div class="card">
+    <div class="page-title">📚 每日阅读</div>
+    <div class="page-sub">财经·商业·医美认知提升 · ${t}</div>
+    ${READ_ITEMS.map((r,i)=>`<div class="item"><h4>${i+1}. ${r.title}</h4><p>${r.desc}</p><a class="link-btn" href="${r.url}" target="_blank" rel="noopener">▶ 点击阅读</a></div>`).join('')}
+    <button class="btn ${check[t]?'':'small'}" onclick="toggleRead()">${check[t]?'✅ 今日已读（点击取消）':'📖 标记今日已读'}</button>
+  </div>`;
+}
+function toggleRead(){const c=getStore('read_check',{});const t=todayStr();c[t]=!c[t];setStore('read_check',c);toast(c[t]?'📖 已标记':'已取消');pageRead();}
+
+/* ============ 6. 医美客户档案 ============ */
+function pageClient(){
+  const list=getStore('clients',[]);
+  content.innerHTML=`
+  <div class="card">
+    <div class="page-title">💼 医美客户档案</div>
+    <div class="page-sub">敏感信息已加密 · 仅本人可见</div>
+    <label>客户姓名/昵称</label><input id="cname" placeholder="如 王小姐">
+    <label>联系电话（加密存储）</label><input id="cphone" placeholder="11位手机号">
+    <label>咨询项目</label><input id="cproj" placeholder="如 双眼皮/玻尿酸">
+    <label>成交状态</label>
+    <select id="cstatus"><option>未到院</option><option>已成交</option><option>未成交</option></select>
+    <label>报备医院</label><input id="chosp" placeholder="如 重庆时光">
+    <label>跟进备注</label><textarea id="cnote" placeholder="后续跟进情况..."></textarea>
+    <button class="btn" onclick="addClient()">➕ 新增客户</button>
+  </div>
+  <div class="card">
+    <div class="page-title">📋 客户列表（${list.length}）</div>
+    <div style="overflow-x:auto"><table><thead><tr><th>姓名</th><th>电话</th><th>项目</th><th>状态</th><th>医院</th><th>操作</th></tr></thead><tbody id="ctbody"></tbody></table></div>
+    <button class="btn small" onclick="exportClients()">⬇️ 导出加密CSV</button>
+  </div>`;
+  renderClients();
+}
+function renderClients(){
+  const list=getStore('clients',[]);
+  const tb=$('#ctbody');if(!tb)return;
+  tb.innerHTML=list.map((c,i)=>`<tr><td>${c.name||'-'}</td><td>${c.phone?decPhone(c.phone).replace(/(\d{3})\d{4}(\d{4})/,'$1****$2'):'-'}</td><td>${c.proj||'-'}</td><td>${c.status||'-'}</td><td>${c.hosp||'-'}</td><td><button class="del" onclick="delClient(${i})">删</button></td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:#c9a9b8">暂无客户</td></tr>';
+}
+function addClient(){
+  const list=getStore('clients',[]);
+  list.push({name:$('#cname').value,phone:encPhone($('#cphone').value),proj:$('#cproj').value,status:$('#cstatus').value,hosp:$('#chosp').value,note:$('#cnote').value});
+  setStore('clients',list);toast('✅ 已新增');pageClient();
+}
+function delClient(i){const list=getStore('clients',[]);list.splice(i,1);setStore('clients',list);toast('已删除');renderClients();}
+function exportClients(){
+  const list=getStore('clients',[]);
+  const csv='姓名,电话(加密),项目,状态,医院,备注\n'+list.map(c=>[c.name,decPhone(c.phone||''),c.proj,c.status,c.hosp,c.note].map(v=>`"${v||''}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='客户档案_'+todayStr()+'.csv';a.click();toast('⬇️ 已导出');
+}
+
+/* ============ 7. 月度业绩记账对账 ============ */
+const HOSP_RATE={
+  '重庆铜雀台':{手术:0.35,植发:0.30,皮肤:0.30,针剂:0.30},
+  '重庆米兰柏羽时光':{手术:0.35,皮肤:0.35,针剂:0.35,植发:0.35},
+  '重庆时光':{手术:0.35,皮肤:0.35,针剂:0.35,植发:0.35},
+  '晶肤':{皮肤:0.30,针剂:0.30},
+  '军美':{手术:0.35,皮肤:0.30,针剂:0.30},
+  '军科':{手术:0.30,皮肤:0.25,针剂:0.25},
+  '美轮美奂':{手术:0.30,皮肤:0.30,针剂:0.30},
+  '艺星':{手术:0.30,皮肤:0.30,针剂:0.30},
+  '联合丽格':{手术:0.30,皮肤:0.30,针剂:0.30},
+  '松山':{手术:0.30,颌面:0.25},
+};
+function projType(p){if(/双眼皮|隆鼻|隆胸|吸脂|眼|鼻|胸|轮廓|下颌|颧骨|颌面|手术/.test(p))return'手术';if(/玻尿酸|肉毒|针|水光/.test(p))return'针剂';if(/植发|毛发/.test(p))return'植发';if(/光子|激光|热玛吉|皮|肤|嫩肤|清洁/.test(p))return'皮肤';return'手术';}
+function pageAccount(){
+  const month=todayStr().slice(0,7);
+  const deals=getStore('deals',[]).filter(d=>d.month===month);
+  content.innerHTML=`
+  <div class="card">
+    <div class="page-title">💰 月度业绩记账对账</div>
+    <div class="page-sub">${month} · 自动按合作医院合同核算提成</div>
+    <label>成交客户电话</label><input id="dphone" placeholder="11位">
+    <label>合作医院</label>
+    <select id="dhosp">${Object.keys(HOSP_RATE).map(h=>`<option>${h}</option>`).join('')}</select>
+    <label>成交项目</label><input id="dproj" placeholder="如 双眼皮/玻尿酸（决定提成比例）">
+    <label>成交总金额(元)</label><input id="damount" type="number" placeholder="如 4500">
+    <button class="btn" onclick="addDeal()">➕ 录入成交</button>
+  </div>
+  <div class="card">
+    <div class="page-title">📊 ${month} 汇总</div>
+    <div class="stat-grid">
+      <div class="stat"><div class="num">${deals.length}</div><div class="lab">成交笔数</div></div>
+      <div class="stat"><div class="num">${sum(deals,'amount')}</div><div class="lab">总营收(元)</div></div>
+      <div class="stat"><div class="num">${sum(deals,'commission')}</div><div class="lab">总提成(元)</div></div>
+    </div>
+    <div class="sechdr">各医院业绩分布</div>
+    <div style="overflow-x:auto"><table><thead><tr><th>医院</th><th>笔数</th><th>营收</th><th>提成</th></tr></thead><tbody id="hospTb"></tbody></table></div>
+    <div class="sechdr">明细</div>
+    <div style="overflow-x:auto"><table><thead><tr><th>电话</th><th>医院</th><th>项目类型</th><th>金额</th><th>提成</th></tr></thead><tbody id="dealTb"></tbody></table></div>
+    <button class="btn small" onclick="exportDeals()">⬇️ 导出月度报表</button>
+  </div>`;
+  renderAccount(deals);
+}
+function sum(arr,k){return arr.reduce((s,d)=>s+(+d[k]||0),0).toLocaleString('zh-CN');}
+function calcCommission(hosp,proj,amount){const map=HOSP_RATE[hosp];if(!map)return 0;let type=projType(proj);let rate=map[type];if(rate==null)rate=map['手术']||0;return Math.round(amount*rate);}
+function addDeal(){
+  const month=todayStr().slice(0,7);
+  const hosp=$('#dhosp').value,proj=$('#dproj').value,amount=+$('#damount').value;
+  if(!amount){toast('请填金额');return;}
+  const comm=calcCommission(hosp,proj,amount);
+  const deals=getStore('deals',[]);
+  deals.push({month,phone:encPhone($('#dphone').value),hosp,proj,type:projType(proj),amount,commission:comm});
+  setStore('deals',deals);toast('✅ 已录入，提成¥'+comm);pageAccount();
+}
+function renderAccount(deals){
+  const tb=$('#dealTb');if(tb)tb.innerHTML=deals.map(d=>`<tr><td>${d.phone?decPhone(d.phone).slice(-4).padStart(decPhone(d.phone).length,'*'):'-'}</td><td>${d.hosp}</td><td>${d.type}</td><td>${d.amount.toLocaleString()}</td><td>${d.commission.toLocaleString()}</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:#c9a9b8">本月暂无成交</td></tr>';
+  const map={};deals.forEach(d=>{if(!map[d.hosp])map[d.hosp]={n:0,a:0,c:0};map[d.hosp].n++;map[d.hosp].a+=d.amount;map[d.hosp].c+=d.commission;});
+  const hb=$('#hospTb');if(hb)hb.innerHTML=Object.keys(map).map(h=>`<tr><td>${h}</td><td>${map[h].n}</td><td>${map[h].a.toLocaleString()}</td><td>${map[h].c.toLocaleString()}</td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:#c9a9b8">暂无</td></tr>';
+}
+function exportDeals(){
+  const month=todayStr().slice(0,7);
+  const deals=getStore('deals',[]).filter(d=>d.month===month);
+  const csv='月份,医院,项目类型,金额,提成\n'+deals.map(d=>[d.month,d.hosp,d.type,d.amount,d.commission].map(v=>`"${v}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='月度对账_'+month+'.csv';a.click();toast('⬇️ 已导出');
+}
+
+/* ============ 8. 每日播客推荐 ============ */
+const PODCASTS=[
+  {title:'《搞钱女孩》',desc:'女性创业·轻资产搞钱实录',kw:'搞钱女孩'},
+  {title:'《天真不天真》',desc:'杨天真·商业与成长',kw:'天真不天真'},
+  {title:'《给女孩的商业第一课》',desc:'女性商业认知启蒙',kw:'给女孩的商业第一课'},
+  {title:'《知行小酒馆》',desc:'投资·生活·思维',kw:'知行小酒馆'},
+  {title:'《声东击西》',desc:'商业科技趋势',kw:'声东击西'},
+];
+function xiaoyuzhou(kw){return 'https://www.xiaoyuzhoufm.com/search?q='+encodeURIComponent(kw);}
+function pagePodcast(){
+  const check=getStore('pod_check',{});const t=todayStr();
+  const seed=Math.abs(hash(t+'p'))%PODCASTS.length;
+  const today=PODCASTS[seed];
+  content.innerHTML=`
+  <div class="card">
+    <div class="page-title">🎙️ 每日播客推荐</div>
+    <div class="page-sub">女性创业·商业认知·情绪成长 · ${t}</div>
+    <div class="item"><h4>🌟 今日推荐：${today.title}</h4><p>${today.desc}</p><a class="link-btn" href="${xiaoyuzhou(today.kw)}" target="_blank" rel="noopener">▶ 小宇宙一键收听</a></div>
+    <button class="btn ${check[t]?'':'small'}" onclick="togglePod()">${check[t]?'✅ 今日已听（点击取消）':'🎧 标记今日已听'}</button>
+  </div>
+  <div class="card">
+    <div class="page-title">📚 往期推荐</div>
+    ${PODCASTS.filter(p=>p.title!==today.title).map(p=>`<div class="item"><h4>${p.title}</h4><p>${p.desc}</p><a class="link-btn" href="${xiaoyuzhou(p.kw)}" target="_blank" rel="noopener">▶ 收听</a></div>`).join('')}
+  </div>`;
+}
+function togglePod(){const c=getStore('pod_check',{});const t=todayStr();c[t]=!c[t];setStore('pod_check',c);toast(c[t]?'🎧 已标记':'已取消');pagePodcast();}
+
+/* ============ 9. 每周自律复盘 ============ */
+function pageReview(){
+  const burn=getStore('burn',{}),sport=getStore('sport_check',{}),en=getStore('en_hist',[]),read=getStore('read_check',{});
+  const weekDays=weekKeys();
+  const sportWk=weekDays.filter(k=>sport[k]).length;
+  const readWk=weekDays.filter(k=>read[k]).length;
+  const enWk=en.filter(h=>weekDays.includes(h.date)).length;
+  const weights=Object.keys(burn).sort().slice(-7).map(k=>burn[k].weight).filter(Boolean);
+  const trend=weights.length>=2?(weights[weights.length-1]-weights[0]).toFixed(1):'-';
+  content.innerHTML=`
+  <div class="card">
+    <div class="page-title">📝 每周自律复盘</div>
+    <div class="page-sub">${weekDays[0]} ~ ${weekDays[weekDays.length-1]}</div>
+    <div class="item"><h4>⚖️ 体重趋势</h4><p>近7天记录 ${weights.length} 次 ｜ 变化 ${trend}kg ${trend!=='-'&&trend<0?'（↓ 减脂中，棒！）':''}</p></div>
+    <div class="item"><h4>🌸 皮肤/抗炎</h4><p>${Object.keys(burn).sort().slice(-7).map(k=>`${k.slice(5)}:${burn[k].skin||'-'}`).join(' ｜ ')||'暂无'}</p></div>
+    <div class="item"><h4>🏃 运动完成</h4><p>本周打卡 ${sportWk}/7 天</p></div>
+    <div class="item"><h4>📖 英语进度</h4><p>本周学习 ${enWk} 天，累计 ${en.length} 天</p></div>
+    <div class="item"><h4>📚 阅读完成</h4><p>本周 ${readWk}/7 天</p></div>
+    <div class="item"><h4>💼 工作优化</h4><p>本月客户 ${getStore('clients',[]).length} 人 ｜ 成交 ${getStore('deals',[]).filter(d=>d.month===todayStr().slice(0,7)).length} 笔</p></div>
+  </div>
+  <div class="card">
+    <div class="page-title">💾 数据备份与恢复</div>
+    <div class="page-sub">建议每周备份一次。换设备 / 清理 Safari 前务必备份，防止记录丢失</div>
+    <button class="btn" onclick="backupAll()">⬇️ 一键备份全部数据</button>
+    <label>从备份文件恢复（覆盖当前数据）</label>
+    <input type="file" id="restoreFile" accept="application/json,.json" onchange="restoreAll(this.files[0])">
+  </div>`;
+}
+function backupAll(){
+  const keys=['burn','period','sport_check','en_hist','read_check','clients','deals','pod_check'];
+  const data={};keys.forEach(k=>data[k]=getStore(k,null));
+  data.__app='qq_workbench';data.__time=new Date().toISOString();
+  const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='倩倩工作台备份_'+todayStr()+'.json';a.click();
+  toast('⬇️ 已备份全部数据');
+}
+function restoreAll(f){
+  if(!f){return;}
+  const r=new FileReader();
+  r.onload=()=>{try{
+    const data=JSON.parse(r.result);
+    if(data.__app!=='qq_workbench'){toast('⚠️ 不是工作台备份文件');return;}
+    Object.keys(data).forEach(k=>{if(k.startsWith('__'))return;setStore(k,data[k]);});
+    toast('✅ 已恢复数据');showPage('burn');
+  }catch(e){toast('⚠️ 恢复失败，文件已损坏');}};
+  r.readAsText(f);
+}
+
+/* ============ 启动 ============ */
+showPage('burn');
+// 内嵌 PWA manifest（单文件版，无需外部文件）
+(function(){
+  const m={name:'倩倩の专属工作台',short_name:'倩倩工作台',display:'standalone',orientation:'portrait',background_color:'#fff0f5',theme_color:'#ff8fb1',start_url:'.'};
+  const l=document.createElement('link');l.rel='manifest';l.href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(m));
+  document.head.appendChild(l);
+})();
+</script>
+</body>
+</html>
+
+
+
