@@ -242,7 +242,7 @@ const MENUS=[
 const sidebar=$('#sidebar');
 MENUS.forEach(m=>{const d=document.createElement('div');d.className='menu-item';d.dataset.id=m.id;d.innerHTML=`<div class="ico">${m.ico}</div><div>${m.name}</div>`;d.onclick=()=>showPage(m.id);sidebar.appendChild(d);});
 const content=$('#content');
-function showPage(id){$$('.menu-item').forEach(e=>e.classList.toggle('active',e.dataset.id===id));content.innerHTML='';const map={burn:pageBurn,period:pagePeriod,sport:pageSport,english:pageEnglish,read:pageRead,client:pageClient,account:pageAccount,podcast:pagePodcast,review:pageReview};(map[id]||pageBurn)();window.scrollTo(0,0);}
+function showPage(id){$$('.menu-item').forEach(e=>e.classList.toggle('active',e.dataset.id===id));content.innerHTML='';const map={burn:pageBurn,period:pagePeriod,sport:pageSport,english:pageEnglish,read:pageRead,client:pageClient,account:pageAccount,podcast:pagePodcast,review:pageReview};(map[id]||pageDash)();window.scrollTo(0,0);}
 /* ============ 1. 减脂抗炎打卡 ============ */
 const MEAL_RECS=[
   {title:'清爽中式的一天',items:['水煮蛋2个 + 全麦馒头1个 + 无糖豆浆300ml · 约320kcal','番茄鸡蛋荞麦面（面80g）+ 凉拌黄瓜 · 约460kcal','清蒸鲈鱼150g + 蒜蓉西兰花 + 杂粮饭半碗 · 约410kcal'],total:1190},
