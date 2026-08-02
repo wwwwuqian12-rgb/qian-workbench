@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%23ff8fb1'/%3E%3Ctext x='256' y='330' font-size='300' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E倩%3C/text%3E%3C/svg%3E">
-<title>倩倩の专属工作台</title>
-<style>
+<title>倩倩の专属工作台</title> 
+  <style>
 :root{--pink-1:#fff0f5;--pink-2:#ffd6e7;--pink-3:#ffb6d5;--pink-4:#ff8fb1;--pink-5:#ff6fa5;--pink-deep:#ec5a92;--text:#5a3a4a;--shadow:0 4px 16px rgba(255,143,177,.25);}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;height:100%;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--pink-1);color:var(--text);}
@@ -62,7 +62,36 @@ th{background:var(--pink-2);color:var(--pink-deep);}
 .sechdr{font-size:15px;font-weight:800;color:var(--pink-deep);margin:14px 0 8px;}
 .empty{text-align:center;color:#c9a9b8;font-size:13px;padding:20px;}
 @media(max-width:420px){.logo{font-size:11px;}.menu-item{width:74px;font-size:10px;}}
-</style>
+  /* 推荐卡片 */
+  .rec-card{background:#fff;border-radius:20px;padding:16px;margin-bottom:16px;box-shadow:var(--shadow);}
+  .rec-title{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:800;color:var(--pink-deep);cursor:pointer;padding:4px 0;}
+  .rec-list{display:none;margin-top:10px;}
+  .rec-list.open{display:block;animation:fade .25s;}
+  .rec-item{background:var(--pink-1);border-radius:14px;padding:10px 12px;margin-bottom:8px;font-size:12px;line-height:1.5;display:flex;gap:8px;align-items:flex-start;}
+  .rec-item .txt{flex:1;}
+  .rec-item .name{font-weight:700;color:var(--pink-deep);margin-bottom:2px;}
+  .rec-item .sub{color:#8b6b7b;font-size:11px;}
+  .rec-disclaimer{font-size:11px;color:#c9a9b8;margin-top:6px;text-align:center;}
+    /* 首页仪表盘 */
+  .dash-greet{font-size:13px;color:#b089a0;margin-bottom:2px;}
+  .dash-pet{text-align:center;padding:16px 0 6px;}
+  .dash-bear{font-size:76px;line-height:1;display:inline-block;animation:breathe 2.4s ease-in-out infinite;}
+  @keyframes breathe{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-6px) scale(1.04);}}
+  .dash-moodtxt{font-size:14px;color:var(--pink-deep);font-weight:700;margin:6px 0 10px;text-align:center;}
+  .dash-moods{display:flex;gap:6px;justify-content:center;}
+  .dash-moods .mb{flex:1;background:var(--pink-1);border:2px solid transparent;border-radius:14px;padding:8px 2px;font-size:11px;text-align:center;cursor:pointer;}
+  .dash-moods .mb .e{font-size:22px;display:block;}
+  .dash-moods .mb.on{border-color:var(--pink-4);background:#fff;box-shadow:var(--shadow);}
+  .dash-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+  .dash-summary .sc{background:#fff;border-radius:16px;padding:12px 10px;text-align:center;box-shadow:var(--shadow);}
+  .dash-summary .sc .t{font-size:11px;color:#b089a0;margin-bottom:4px;}
+  .dash-summary .sc .n{font-size:18px;font-weight:800;color:var(--pink-deep);}
+  .dash-summary .sc .s{font-size:10px;color:#8b6b7b;margin-top:3px;line-height:1.3;}
+  .bar{height:8px;border-radius:6px;background:var(--pink-2);margin-top:6px;overflow:hidden;}
+  .bar > i{display:block;height:100%;background:linear-gradient(135deg,var(--pink-4),var(--pink-5));}
+  .dash-quote{background:linear-gradient(135deg,var(--pink-4),var(--pink-5));color:#fff;border-radius:18px;padding:16px;font-size:14px;line-height:1.6;text-align:center;box-shadow:var(--shadow);margin-bottom:16px;}
+  .dash-quote .qh{font-size:12px;opacity:.85;margin-top:6px;}
+ </style>
 </head>
 <body>
 <div class="app">
@@ -80,7 +109,126 @@ function setStore(key,val){localStorage.setItem('qq_'+key,JSON.stringify(val));}
 function encPhone(p){try{return btoa(unescape(encodeURIComponent(p)));}catch(e){return p;}}
 function decPhone(s){try{return decodeURIComponent(escape(atob(s)));}catch(e){return s;}}
 function speak(text){if(!('speechSynthesis'in window)){toast('当前浏览器不支持发音');return;}const u=new SpeechSynthesisUtterance(text);u.lang='en-GB';u.rate=.9;window.speechSynthesis.cancel();window.speechSynthesis.speak(u);}
+/* ============ 首页仪表盘 数据与函数 ============ */
+const MOODS=[
+  {k:'happy',e:'😄',t:'超开心'},{k:'good',e:'🙂',t:'还不错'},
+  {k:'normal',e:'😐',t:'一般'},{k:'sad',e:'😟',t:'有点丧'},{k:'angry',e:'😡',t:'想发火'}
+];
+const QUOTES=[
+  '今天也要好好吃饭、好好爱自己。',
+  '慢慢来，比较快。',
+  '你不需要很厉害才能开始，但开始了就会变厉害。',
+  '每一个自律的今天，都是未来感谢的自己。',
+  '允许自己偶尔摆烂，是为了更好地出发。',
+  '星星发亮，是为了让每一个人都能找到属于自己的星星。',
+  '你已经做得很好了，真的。',
+  '把日子过成自己喜欢的样子，就是最好的成功。',
+  '少一点焦虑，多一点行动。',
+  '今天的努力，是给明天的自己最好的礼物。',
+  '照顾好身体，才扛得住梦想。',
+  '温柔地对待自己，也是一种力量。',
+  '不慌不忙，自有力量。',
+  '你比想象中更坚韧。',
+  '先成为自己的光，再去照亮别人。',
+  '一次的坚持很小，一万次的坚持很大。',
+  '把烦恼留在昨天，把笑容留给今天。',
+  '热爱可抵岁月漫长。',
+  '你可以同时害怕和勇敢。',
+  '生活明朗，万物可爱。',
+  '别让别人的节奏，打乱你自己的步调。',
+  '今天也要元气满满鸭！',
+  '温柔且坚定，安静且丰盈。',
+  '只要路是对的，就不怕路远。'
+];
+const ZODIAC=['白羊座','金牛座','双子座','巨蟹座','狮子座','处女座','天秤座','天蝎座','射手座','摩羯座','水瓶座','双鱼座'];
+const FORTUNE={
+  colors:['蜜桃粉','雾霾蓝','奶油白','薄荷绿','向日葵黄','薰衣草紫','珊瑚橙','天青色','燕麦色','玫瑰金','浅雾灰','樱草黄'],
+  nums:[3,6,8,9,12,15,18,21,24,27,33,36],
+  tips:['今天适合主动出击，机会偏爱有准备的人。','放平心态，水到渠成。','多倾听身体的声音，少内耗。','一笔小确幸正在路上，留意消息。','适合整理与复盘，清空烦恼。','与人相处多些耐心，关系更顺。','今天的你格外有魅力，大胆表达。','慢一点没关系，稳才是王道。','适合学习新东西，吸收力满分。','给自己一个小奖励，值得的。','少比较，多专注自己，幸福感up。','适合做决定，直觉很准。']
+};
+function getSettings(){return getStore('settings',{});}
+function setSetting(k,v){const s=getSettings();s[k]=v;setStore('settings',s);}
+function todayMood(){const m=getStore('moods',{});return m[todayStr()]||null;}
+function setMood(k){const m=getStore('moods',{});m[todayStr()]=k;setStore('moods',m);pageDash();}
+function todayCheckIn(){
+  let n=0;
+  if(getStore('burn',{})[todayStr()])n++;
+  if(getStore('sport',{})[todayStr()])n++;
+  if(getStore('english',{})[todayStr()])n++;
+  if(getStore('read_check',{})[todayStr()])n++;
+  return n;
+}
+function monthDeals(){
+  const month=todayStr().slice(0,7);
+  const ds=getStore('deals',[]).filter(d=>d.month===month);
+  const cnt=ds.length, comm=ds.reduce((s,d)=>s+(+d.commission||0),0);
+  return {cnt,comm};
+}
+function dayOfYear(){const d=new Date();const start=new Date(d.getFullYear(),0,0);return Math.floor((d-start)/86400000);}
+function dailyQuote(){return QUOTES[dayOfYear()%QUOTES.length];}
+function seedFrom(str){let h=0;for(let i=0;i<str.length;i++)h=(h*31+str.charCodeAt(i))>>>0;return h;}
+function dailyFortune(){
+  const s=getSettings();const z=s.zodiac||'处女座';
+  const zi=Math.max(0,ZODIAC.indexOf(z));
+  const seed=seedFrom(todayStr()+z);
+  const color=FORTUNE.colors[(seed+zi)%FORTUNE.colors.length];
+  const num=FORTUNE.nums[(seed*7+zi)%FORTUNE.nums.length];
+  const tip=FORTUNE.tips[(seed*13+zi)%FORTUNE.tips.length];
+  return {z,color,num,tip};
+}
+function renderDashCal(){
+  const d=new Date(),y=d.getFullYear(),m=d.getMonth();
+  const first=new Date(y,m,1).getDay();
+  const days=new Date(y,m+1,0).getDate();
+  const burn=getStore('burn',{});
+  const t=todayStr();
+  let cells='';
+  for(let i=0;i<first;i++)cells+='<div class="cell"></div>';
+  for(let dd=1;dd<=days;dd++){
+    const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');
+    const cls='cell'+(burn[ds]?' done':'')+(ds===t?' today':'');
+    cells+='<div class="'+cls+'">'+dd+'</div>';
+  }
+  const wk=['日','一','二','三','四','五','六'];
+  return '<div class="cal"><div class="wd">'+wk.join('</div><div class="wd">')+'</div></div><div class="cal">'+cells+'</div>';
+}
+function pageDash(){
+  const s=getSettings();
+  const d=new Date();
+  const wk=['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][d.getDay()];
+  const greet=(d.getHours()<11?'早上好':d.getHours()<18?'下午好':'晚上好');
+  const dateStr=(d.getMonth()+1)+'月'+d.getDate()+'日 '+wk;
+  const mk=todayMood();
+  const moodObj=MOODS.find(m=>m.k===mk);
+  const ci=todayCheckIn();
+  const md=monthDeals();
+  const goal=+s.goal||10;
+  const prog=Math.min(100,Math.round(md.cnt/goal*100));
+  const f=dailyFortune();
+  const q=dailyQuote();
+  const zodiacOpts=ZODIAC.map(z=>'<option '+(s.zodiac===z?'selected':'')+'>'+z+'</option>').join('');
+  content.innerHTML=
+  '<div class="card">'+
+    '<div class="dash-greet">'+greet+'！'+dateStr+'</div>'+
+    '<div class="page-title">🐻 倩倩の小熊电台</div>'+
+    '<div class="dash-pet"><span class="dash-bear">🐻</span></div>'+
+    '<div class="dash-moodtxt">'+(moodObj?('今天你'+moodObj.t+moodObj.e):'今天心情怎么样？点一下小熊下面的表情告诉我～')+'</div>'+
+    '<div class="dash-moods">'+MOODS.map(m=>'<div class="mb '+(mk===m.k?'on':'')+'" onclick="setMood(\''+m.k+'\')"><span class="e">'+m.e+'</span>'+m.t+'</div>').join('')+'</div>'+
+  '</div>'+
+  '<div class="dash-summary">'+
+    '<div class="sc"><div class="t">今日打卡</div><div class="n">'+ci+'/4</div><div class="s">'+(ci===4?'全勤棒棒':(ci>0?'已打卡'+ci+'项':'还没开始'))+'</div></div>'+
+    '<div class="sc"><div class="t">本月业绩</div><div class="n">'+md.cnt+'单</div><div class="s">提成¥'+md.comm.toLocaleString('zh-CN')+'</div><div class="bar"><i style="width:'+prog+'%"></i></div><div class="s">目标'+goal+'单</div></div>'+
+    '<div class="sc"><div class="t">'+f.z+'运势</div><div class="n" style="font-size:13px">幸运色 '+f.color+'</div><div class="s">幸运数字 '+f.num+'<br>'+f.tip+'</div></div>'+
+  '</div>'+
+  '<div class="card"><div class="page-title">📅 本月日历</div>'+renderDashCal()+'</div>'+
+  '<div class="dash-quote">「 '+q+' 」<div class="qh">—— 每日金句</div></div>'+
+  '<div class="card"><div class="page-title">⚙️ 个性化设置</div>'+
+    '<label>我的星座</label><select id="dszodiac" onchange="setSetting(\'zodiac\',this.value);pageDash();">'+zodiacOpts+'</select>'+
+    '<label>月度目标单数</label><input id="dsgoal" type="number" value="'+goal+'" onchange="setSetting(\'goal\',this.value);pageDash();">'+
+  '</div>';
+}
 const MENUS=[
+{id:'dash',ico:'🏠',name:'首页'},
 {id:'burn',ico:'🔥',name:'抗炎打卡'},
 {id:'period',ico:'🌸',name:'生理期'},
 {id:'sport',ico:'🏃',name:'运动打卡'},
@@ -96,6 +244,28 @@ MENUS.forEach(m=>{const d=document.createElement('div');d.className='menu-item';
 const content=$('#content');
 function showPage(id){$$('.menu-item').forEach(e=>e.classList.toggle('active',e.dataset.id===id));content.innerHTML='';const map={burn:pageBurn,period:pagePeriod,sport:pageSport,english:pageEnglish,read:pageRead,client:pageClient,account:pageAccount,podcast:pagePodcast,review:pageReview};(map[id]||pageBurn)();window.scrollTo(0,0);}
 /* ============ 1. 减脂抗炎打卡 ============ */
+const MEAL_RECS=[
+  {title:'清爽中式的一天',items:['水煮蛋2个 + 全麦馒头1个 + 无糖豆浆300ml · 约320kcal','番茄鸡蛋荞麦面（面80g）+ 凉拌黄瓜 · 约460kcal','清蒸鲈鱼150g + 蒜蓉西兰花 + 杂粮饭半碗 · 约410kcal'],total:1190},
+  {title:'轻食西式的一天',items:['燕麦40g + 牛奶200ml + 蓝莓一小把 · 约310kcal','鸡胸肉沙拉（鸡胸肉100g/生菜/圣女果/半根玉米/油醋汁） · 约420kcal','香煎三文鱼100g + 芦笋 + 蒸南瓜150g · 约390kcal'],total:1120},
+  {title:'川渝少油版',items:['无糖豆浆300ml + 茶叶蛋2个 + 小红薯1个 · 约300kcal','青椒炒鸡胸（少油）+ 糙米饭100g + 紫菜蛋花汤 · 约480kcal','凉拌鸡丝（黄瓜/胡萝卜）+ 蒸茄子 + 杂粮粥 · 约380kcal'],total:1160},
+  {title:'高蛋白减脂日',items:['希腊酸奶150g + 香蕉半根 + 坚果10g · 约330kcal','白灼虾150g + 糙米饭100g + 清炒油麦菜 · 约470kcal','牛肉番茄汤（瘦牛肉80g）+ 蒸土豆1个 + 凉拌木耳 · 约430kcal'],total:1230},
+  {title:'快手上班族',items:['全麦吐司2片 + 花生酱10g + 黑咖啡 · 约320kcal','去皮鸡腿1个 + 青菜 + 米饭半份 · 约500kcal','豆腐菌菇汤 + 蒸玉米1根 + 圣女果 · 约360kcal'],total:1180}
+];
+const JUICE_RECS=[
+  {name:'紫甘蓝苹果番茄',desc:'紫甘蓝50g + 苹果半个 + 番茄1个 + 水200ml',cal:95},
+  {name:'羽衣甘蓝香蕉奶昔',desc:'羽衣甘蓝30g + 香蕉半根 + 无糖酸奶100g + 水',cal:130},
+  {name:'胡萝卜姜柠汁',desc:'胡萝卜半根 + 柠檬2片 + 姜2g + 水',cal:60},
+  {name:'黄瓜芹菜雪梨',desc:'黄瓜半根 + 芹菜1根 + 雪梨半个 + 水',cal:90},
+  {name:'蓝莓菠菜椰汁',desc:'蓝莓40g + 菠菜30g + 椰子水200ml',cal:85},
+  {name:'菠萝姜黄汁',desc:'菠萝100g + 姜黄粉1小撮 + 水',cal:75},
+  {name:'甜菜根苹果胡萝卜',desc:'甜菜根30g + 苹果半个 + 胡萝卜半根 + 水',cal:110},
+  {name:'牛油果菠菜奶昔',desc:'牛油果1/4个 + 菠菜30g + 无糖豆浆150ml',cal:145}
+];
+function fillMeal(text){const el=$('#bmeal');if(el)el.value=text;}
+function fillJuice(text){const el=$('#bjuice');if(el)el.value=text;}
+function applyMeal(idx){const m=MEAL_RECS[idx];fillMeal('早餐：'+m.items[0]+'\n午餐：'+m.items[1]+'\n晚餐：'+m.items[2]+'\n合计约 '+m.total+' kcal');}
+function applyJuice(idx){const j=JUICE_RECS[idx];fillJuice(j.name+'：'+j.desc+'（约'+j.cal+'kcal）');}
+function toggleRec(id){const el=$(id);if(el)el.classList.toggle('open');}
 function pageBurn(){
   const data=getStore('burn',{});
   const t=todayStr(); const rec=data[t]||{};
@@ -112,7 +282,21 @@ function pageBurn(){
     <select id="bskin"><option value="">请选择</option><option ${rec.skin==='稳定'?'selected':''}>稳定</option><option ${rec.skin==='泛红'?'selected':''}>泛红</option><option ${rec.skin==='加重'?'selected':''}>加重</option></select>
     <label>水肿情况</label>
     <select id="bswell"><option value="">请选择</option><option ${rec.swell==='无'?'selected':''}>无</option><option ${rec.swell==='轻微'?'selected':''}>轻微</option><option ${rec.swell==='明显'?'selected':''}>明显</option></select>
-    <button class="btn" onclick="saveBurn()">💾 保存今日打卡</button>
+        <div class="rec-card">
+      <div class="rec-title" onclick="toggleRec('#mealRecs')">🍽️ 减脂餐推荐（点击展开）</div>
+      <div class="rec-list" id="mealRecs">
+        ${MEAL_RECS.map((m,i)=>`<div class="rec-item"><div class="txt"><div class="name">${m.title} · 合计约${m.total}kcal</div><div class="sub">${m.items.join('<br>')}</div></div><button class="btn small" onclick="applyMeal(${i})">选这个</button></div>`).join('')}
+      </div>
+      <div class="rec-disclaimer">热量估算仅供参考，实际因食材分量和做法会有差异</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-title" onclick="toggleRec('#juiceRecs')">🥤 抗炎果汁推荐（点击展开）</div>
+      <div class="rec-list" id="juiceRecs">
+        ${JUICE_RECS.map((j,i)=>`<div class="rec-item"><div class="txt"><div class="name">${j.name}</div><div class="sub">${j.desc} · 约${j.cal}kcal</div></div><button class="btn small" onclick="applyJuice(${i})">选这个</button></div>`).join('')}
+      </div>
+      <div class="rec-disclaimer">热量估算仅供参考</div>
+    </div>
+<button class="btn" onclick="saveBurn()">💾 保存今日打卡</button>
   </div>
   <div class="card">
     <div class="page-title">📈 近期记录</div>
@@ -493,7 +677,7 @@ function restoreAll(f){
 }
 
 /* ============ 启动 ============ */
-showPage('burn');
+showPage('dash');
 // 内嵌 PWA manifest（单文件版，无需外部文件）
 (function(){
   const m={name:'倩倩の专属工作台',short_name:'倩倩工作台',display:'standalone',orientation:'portrait',background_color:'#fff0f5',theme_color:'#ff8fb1',start_url:'.'};
