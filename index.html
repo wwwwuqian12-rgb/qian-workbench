@@ -210,8 +210,10 @@ function pageDash(){
   content.innerHTML=
   '<div class="card">'+
     '<div class="dash-greet">'+greet+'！'+dateStr+'</div>'+
-    '<div class="page-title">🐻 倩倩の小熊电台</div>'+
-    '<div class="dash-pet"><span class="dash-bear">🐻</span></div>'+
+    '<div class="page-title">🐶 倩倩の柴犬电台
+</div>'+
+    '<div class="dash-pet"><img class="dash-bear" src="e445191c2e09efec4784bb877a7f543e.jpeg" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
+</div>'+
     '<div class="dash-moodtxt">'+(moodObj?('今天你'+moodObj.t+moodObj.e):'今天心情怎么样？点一下小熊下面的表情告诉我～')+'</div>'+
     '<div class="dash-moods">'+MOODS.map(m=>'<div class="mb '+(mk===m.k?'on':'')+'" onclick="setMood(\''+m.k+'\')"><span class="e">'+m.e+'</span>'+m.t+'</div>').join('')+'</div>'+
   '</div>'+
